@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NTracker</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: rgb(24, 67, 109);
+      }
+
+      .header {
+        overflow: hidden;
+        background-color: #555;
+        padding: 10px 10px;
+      }
+
+      .header a {
+        float: left;
+        color: whitesmoke;
+        text-align: center;
+        padding: 12px;
+        text-decoration: none;
+        font-size: 18px;
+        line-height: 25px;
+        border-radius: 4px;
+      }
+
+      .header a.logo {
+        color: rgb(117, 178, 239);
+        font-size: 40px;
+        font-weight: bold;
+      }
+
+      .header a:hover {
+        background-color: #ddd;
+        color: black;
+      }
+
+      .header a.active {
+        background-color: dodgerblue;
+        color: white;
+      }
+
+      .header-right {
+        float: right;
+      }
+
+      .top-container {
+        background-color: #f1f1f1;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header {
+        padding: 10px 16px;
+        background: #555;
+        color: #f1f1f1;
+      }
+
+      .content {
+        padding: 16px;
+      }
+
+      .sticky {
+        position: fixed;
+        top: 0;
+        width: 100%;
+      }
+
+      .sticky + .content {
+        padding-top: 102px;
+      }
+      /* The actual timeline (the vertical ruler) */
+      .timeline {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto
+      }
+
+      /* The actual timeline (the vertical ruler) */
+      .timeline::after {
+        content: "";
+        position: absolute;
+        width: 6px;
+        background-color: white;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        margin-left: -3px;
+      }
+
+      /* Container around content */
+      .container {
+        padding: 10px 40px;
+        position: relative;
+        background-color: inherit;
+        width: 50%;
+      }
+
+      /* The circles on the timeline */
+      .container::after {
+        content: "";
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        right: -17px;
+        background-color: white;
+        border: 4px solid #ff9f55;
+        top: 15px;
+        border-radius: 50%;
+        z-index: 1;
+      }
+
+      /* Place the container to the left */
+      .left {
+        left: 0;
+      }
+
+      /* Place the container to the right */
+      .right {
+        left: 50%;
+      }
+
+      /* Add arrows to the left container (pointing right) */
+      .left::before {
+        content: " ";
+        height: 0;
+        position: absolute;
+        top: 22px;
+        width: 0;
+        z-index: 1;
+        right: 30px;
+        border: medium solid white;
+        border-width: 10px 0 10px 10px;
+        border-color: transparent transparent transparent white;
+      }
+
+      /* Add arrows to the right container (pointing left) */
+      .right::before {
+        content: " ";
+        height: 0;
+        position: absolute;
+        top: 22px;
+        width: 0;
+        z-index: 1;
+        left: 30px;
+        border: medium solid white;
+        border-width: 10px 10px 10px 0;
+        border-color: transparent white transparent transparent;
+      }
+
+      /* Fix the circle for containers on the right side */
+      .right::after {
+        left: -16px;
+      }
+
+      /* The actual content */
+      .content {
+        padding: 20px 30px;
+        background-color: white;
+        position: relative;
+        border-radius: 6px;
+      }
+
+      /* Media queries - Responsive timeline on screens less than 600px wide */
+      @media screen and (max-width: 600px) {
+        /* Place the timelime to the left */
+        .timeline::after {
+          left: 31px;
+        }
+
+        /* Full-width containers */
+        .container {
+          width: 100%;
+          padding-left: 70px;
+          padding-right: 25px;
+        }
+
+        /* Make sure that all arrows are pointing leftwards */
+        .container::before {
+          left: 60px;
+          border: medium solid white;
+          border-width: 10px 10px 10px 0;
+          border-color: transparent white transparent transparent;
+        }
+
+        /* Make sure all circles are at the same spot */
+        .left::after,
+        .right::after {
+          left: 15px;
+        }
+
+        /* Make all right containers behave like the left ones */
+        .right {
+          left: 0%;
+        }
+      }
+      .dropbtn {
+        background-color: dodgerblue;
+        color: white;
+        padding: 16px;
+        font-size: 16px;
+        border: none;
+      }
+
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: relative;
+        background-color: #f1f1f1;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+      }
+
+      .dropdown-content a {
+        color: whitesmoke;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+      }
+
+      .dropdown-content a:hover {
+        background-color: #ddd;
+      }
+
+      .dropdown:hover .dropdown-content {
+        display: block;
+      }
+
+      .dropdown:hover .dropbtn {
+        background-color: dodgerblue;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <a href="#default" class="logo">NTracker</a>
+      <div class="header-right">
+        <a class="active" href="/main/main.html">Home</a>
+
+        <a href="/main/about.html">About</a>
+      </div>
+    </div>
+
+    <div class="top-container">
+      <h1>News heading</h1>
+      <p>flash news content here!</p>
+    </div>
+
+    <div class="header" id="myHeader">
+      <a class="but" href="/main/current.html">Current</a>
+      <a class="but" href="/main/world.html">World</a>
+      <a class="but" href="/main/local.html">Local</a>
+      <a class="but" href="/main/history.html">Sports</a>
+      <a class="but" href="/main/entertainment.html">Entertainment</a>
+      <div class="dropdown">
+        <button class="dropbtn">Search box</button>
+        <div class="dropdown-content">
+          <a href="#section1">Jan 2022</a>
+          <a href="#section2">Feb 2022</a>
+          <a href="#section3">Mar 2022</a>
+          <a href="#section4">Apr 2022</a>
+          <a href="#section5">may 2022</a>
+          <a href="#section6">Jun 2022</a>
+          <a href="#section7">Jul 2022</a>
+          <a href="#section8">Aug 2022</a>
+          <a href="#section9">Sep 2022</a>
+          <a href="#section10">Oct 2022</a>
+          <a href="#section11">Nov 2022</a>
+          <a href="#section11">Dec 2022</a>
+        </div>
+      </div>
+    </div>
+    <div class="timeline">
+      <div class="container left">
+        <div class="content">
+          <div class="section one" id="section1">
+            <h2>Jan 2022</h2>
+            <p>
+              Myanmar: Voices of the people must be ‘heard and amplified’.As Myanmar nears the first anniversary of the military coup that saw the arrest of national icon Aung San Suu Kyi and her civilian government dissolved, the UN chief said on Sunday that he stands in “solidarity with the people”, and for a return to an inclusive, democratic society
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="container right">
+        <div class="content">
+          <div class="section two" id="section2">
+            <h2>Feb 2022</h2>
+            <p>
+              Syria: Use of chemical weapons ‘blight’ on international community’s conscience.Impunity for the use of chemical weapons is “intolerable,” the UN disarmament chief told the Security Council meeting on Syria. “Any use of chemical weapons is unacceptable and the absence of accountability for the past use of such weapons remains a blight on the conscience of the international community,” said High Representative Izumi Nakamitsu.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="container left">
+        <div class="content">
+          <div class="section three" id="section3">
+            <h2>Mar 2022</h2>
+            <p>
+              Srilanka in Deep Crisis - #GoHomeGotabaya. China has disgraced Srilanka. Srilanka is now greatly suffering. The Politicians and the Rajapaksa family are Power Hungry people. But they don't care about the People's Protests, issues or their Future. The Governor of Srilankan Central Bank has resigned. The Treasury head has resigned. New Persons were appointed to the Post. The newly appointed Finance Minister resigned within 24 hours. Gotabaya has not accepted the Finance Minister's resignation and is looking for a Replacement.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="container right">
+        <div class="content">
+          <div class="section three" id="section4"></div>
+            <h2>Apr 2022</h2>
+              <p>
+                Acquisition of Twitter by Elon Musk.began on April 14, 2022, and concluded on October 27, 2022. Business magnate Elon Musk began buying shares of American social media company Twitter, Inc. in January 2022, eventually becoming the company's largest shareholder in April with a 9.1 percent ownership stake.Tesla CEO Elon Musk completed the deal to acquire Twitter at his original offer price of $54.20 a share at a total cost of roughly $44 billion
+              </p>
+          </div>
+        </div>
+      </div>
+      <div class="container left">
+        <div class="content">
+          <div class="section three" id="section5"></div>
+           <h2>May 2022</h2>
+             <p>
+              Over a billion methamphetamine tabs seized in East and Southeast Asia.More than one billion methamphetamine tablets were seized in East and Southeast Asia last year, the UN Office on Drugs and Crime (UNODC) has warned. The staggering drugs haul across the vast region is further proof that illicit manufacturing there continues to expand unchecked, with “extreme volumes of methamphetamine” in production, along with a decreasing number of new synthetic psychoactive substances.
+            </p>
+        </div>
+      </div>
+      <div class="container right">
+        <div class="content">
+          <div class="section three" id="section6"></div>
+           <h2>Jun 2022</h2>
+             <p>
+               Agnipath Protests What does the Youth of India want?More than 200 Train Service in India has been affected. More than 35 Trains have been cancelled.The Protests against Agnipath are the Reason. Agnipath Scheme allows youths to serve in the Indian army for 4 years. When the Scheme was announced many supported it and many were against the Scheme. Politics and Youngsters' requests for employment are the main issues faced by Agnipath Scheme.
+             </p>
+        </div>
+      </div>
+      <div class="container left">
+        <div class="content">
+          <div class="section three" id="section7"></div>
+          <h2>Jul 2022</h2>
+          <p>
+            : Mirabai Chanu wins first Gold medal for India at Commonwealth Games 2022; Creates new Commonwealth record in 49 kg Weightlifting; Bindyarani Devi bags Silver in 55 kg category. President Draupadi Murmu and Prime Minister Narendra Modi congratulate winners
+          </p>
+        </div>
+      </div>
+      <div class="container right">
+        <div class="content">
+          <div class="section three" id="section8"></div>
+          <h2>Aug 2022</h2>
+          <p>
+            Foreign national tests positive for Monkeypox in Delhi, 8th case in country, 3rd in capitalNEW DELHI: A 35-year-old man of African origin with no recent t history of foreign travel has tested positive for  monkeypox in Delhi.
+          </p>
+        </div>
+      </div>
+      <div class="container left">
+        <div class="content">
+          <div class="section three" id="section9"></div>
+          <h2>Sep 2022</h2>
+          <p>
+            Prime Minister Narendra Modi to flag off new and upgraded version of Gandhinagar-Mumbai Vande Bharat Express today; To also inaugurate Ahmedabad Metro rail project in Gujarat. President Droupadi M urmu to present 68th National Film Awards in New Delhi this evening..
+          </p>
+        </div>
+      </div>
+      <div class="container right">
+        <div class="content">
+          <div class="section three" id="section10"></div>
+          <h2>Oct 2022</h2>
+          <p>
+            Morbi bridge collapse: 5 NDRF teams, Army carrying out rescue ops on war footing. A nearly 100-year-old suspension bridge over the Machchhu River in Morbi, Gujarat, collapsed on Sunday evening, claiming more than 130 lives. Five teams of NDRF, Army, SDRF and local administration are carrying out search and rescue operations on war footing.
+          </p>
+        </div>
+      </div>
+      <div class="container left">
+        <div class="content">
+          <div class="section three" id="section11"></div>
+          <h2>Nov 2022</h2>
+          <p>
+            Biggest layoff in tech sector this year? Meta to start firing employees today.In a mail sent to hundreds of executives, the company's CEO claimed responsibility for the problem of an inflated workforce. Zuckerberg claimed the problem originated from his 'over-optimism' about growth.
+          </p>
+        </div>
+      </div>
+      <div class="container right">
+        <div class="content">
+          <div class="section three" id="section12"></div>
+          <h2>Dec 2022</h2>
+          <p>
+            BTS’s RM Announces Solo Album “Indigo”. RM has already given fans an honest look into his world through two
+            Mixtapes. Through Indigo, RM delivers his candid thoughts and feelings and showcases a wide-ranging music through collaborations with various artists. We hope everyone’s excited about RM’s latest release!. Release: 2 PM, Friday, December 2, 2022 (KST)
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
